@@ -23,20 +23,6 @@ CREATE SCHEMA main;
 
 
 --
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-
-
---
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
-
-
---
 -- Name: intarray; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -1515,7 +1501,7 @@ UNION ALL
     ind_commodity_properties.ind_id,
     '-1'::integer AS quant_id
    FROM public.ind_commodity_properties
-  WITH DATA;
+  WITH NO DATA;
 
 
 --
@@ -1714,7 +1700,7 @@ UNION ALL
     ind_context_properties.ind_id,
     '-1'::integer AS quant_id
    FROM public.ind_context_properties
-  WITH DATA;
+  WITH NO DATA;
 
 
 --
@@ -2356,7 +2342,7 @@ UNION ALL
     ind_country_properties.ind_id,
     '-1'::integer AS quant_id
    FROM public.ind_country_properties
-  WITH DATA;
+  WITH NO DATA;
 
 
 --
@@ -3786,7 +3772,9 @@ CREATE MATERIALIZED VIEW public.download_attributes_mv AS
     da.years,
     da.created_at,
     da.updated_at,
-    a.id AS attribute_id
+    a.id AS attribute_id,
+    a.original_type,
+    a.original_id
    FROM ((public.download_quants daq
      JOIN public.download_attributes da ON ((da.id = daq.download_attribute_id)))
      JOIN public.attributes_mv a ON (((a.original_id = daq.quant_id) AND (a.original_type = 'Quant'::text))))
@@ -3798,25 +3786,13 @@ UNION ALL
     da.years,
     da.created_at,
     da.updated_at,
-    a.id AS attribute_id
+    a.id AS attribute_id,
+    a.original_type,
+    a.original_id
    FROM ((public.download_quals daq
      JOIN public.download_attributes da ON ((da.id = daq.download_attribute_id)))
      JOIN public.attributes_mv a ON (((a.original_id = daq.qual_id) AND (a.original_type = 'Qual'::text))))
   WITH NO DATA;
-
-
---
--- Name: MATERIALIZED VIEW download_attributes_mv; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON MATERIALIZED VIEW public.download_attributes_mv IS 'Materialized view which merges download_quals and download_quants with download_attributes.';
-
-
---
--- Name: COLUMN download_attributes_mv.attribute_id; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN public.download_attributes_mv.attribute_id IS 'References the unique id in attributes_mv.';
 
 
 --
@@ -4046,9 +4022,9 @@ CREATE VIEW public.download_flows_v AS
         UNION ALL
          SELECT f_1.flow_id,
             f_1.quant_id,
-            'Quant'::text,
+            'Quant'::text AS text,
             f_1.value,
-            NULL::text,
+            NULL::text AS text,
             q.name,
             q.unit
            FROM (public.flow_quants f_1
@@ -7460,10 +7436,10 @@ CREATE UNIQUE INDEX dashboards_sources_unique_idx ON public.dashboards_sources_m
 
 
 --
--- Name: download_attributes_mv_context_id_attribute_id_idx; Type: INDEX; Schema: public; Owner: -
+-- Name: download_attributes_mv_context_id_original_type_original_id_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX download_attributes_mv_context_id_attribute_id_idx ON public.download_attributes_mv USING btree (context_id, attribute_id);
+CREATE INDEX download_attributes_mv_context_id_original_type_original_id_idx ON public.download_attributes_mv USING btree (context_id, original_type, original_id);
 
 
 --
@@ -9113,6 +9089,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190321161913'),
 ('20190403153118'),
 ('20190403153119'),
-('20190403153135');
+('20190403153135'),
+('20190409190106');
 
 
