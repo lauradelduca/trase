@@ -4,6 +4,7 @@ import sortBy from 'lodash/sortBy';
 import kebabCase from 'lodash/kebabCase';
 import CHART_CONFIG from 'react-components/dashboard-element/dashboard-widget/dashboard-widget-config';
 import { CHART_TYPES } from 'constants';
+import camelCase from 'lodash/camelCase';
 
 const parsedChartTypes = {
   bar_chart: CHART_TYPES.bar,
@@ -34,6 +35,29 @@ const getGroupedAxis = (axis, meta) => {
 };
 
 const sortGroupedAxis = keys => sortBy(Object.keys(keys), key => parseInt(key.substr(1), 10));
+
+const getPluralNodeType = nodeType => {
+  const name = camelCase(nodeType);
+  return (
+    {
+      country: 'countries',
+      municipality: 'municipalities'
+    }[name] || `${nodeType}s`.toLowerCase()
+  );
+};
+
+export const getTitle = createSelector(
+  [getMeta],
+  meta => {
+    if (!meta || !meta.info) return '';
+    const topNPart = meta.info.top_n ? `Top ${meta.info.top_n}` : null;
+    const nodeTypePart = meta.info.node_type
+      ? getPluralNodeType(meta.info.node_type)
+      : 'Global overview';
+    const filterPart = meta.info.filter.companies;
+    return [topNPart, nodeTypePart, filterPart].filter(Boolean).join(' ');
+  }
+);
 
 export const getColors = createSelector(
   [getMeta, getData, getDefaultConfig, getChartType, getSelectedRecolorBy],
