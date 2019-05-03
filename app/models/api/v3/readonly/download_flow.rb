@@ -40,7 +40,6 @@
 #  download_flows_mv_context_id_idx                            (context_id)
 #  download_flows_mv_country_node_id_idx                       (country_node_id)
 #  download_flows_mv_exporter_node_id_idx                      (exporter_node_id)
-#  download_flows_mv_importer_node_id_idx                      (importer_node_id)
 #  download_flows_mv_row_name_attribute_type_attribute_id_idx  (row_name,attribute_type,attribute_id) UNIQUE
 #
 

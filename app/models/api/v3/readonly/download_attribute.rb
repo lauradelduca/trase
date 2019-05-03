@@ -11,8 +11,7 @@
 #
 # Indexes
 #
-#  download_attributes_mv_context_id_attribute_id_idx  (context_id,attribute_id)
-#  download_attributes_mv_id_idx                       (id) UNIQUE
+#  download_attributes_mv_id_idx  (id) UNIQUE
 #
 
 module Api
